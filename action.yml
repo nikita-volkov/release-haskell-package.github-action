@@ -83,4 +83,3 @@ runs:
         from_branch: ${{ github.ref_name }}
         target_branch: ${{ inputs.main-branch }}
         github_token: ${{ github.token }}
-        message: Set package version to ${{ steps.bump-cabal-version.outputs.after }}
