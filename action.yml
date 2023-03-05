@@ -24,7 +24,7 @@ inputs:
       To determine the place from a branch name you can use the following expression:
 
       ```
-      fromJSON('{"supermajor":0,major":1,"minor":2,"patch":3}')[github.ref_name]
+      fromJSON('{"supermajor":0,"major":1,"minor":2,"patch":3}')[github.ref_name]
       ```
     required: true
 
