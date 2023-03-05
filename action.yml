@@ -33,6 +33,11 @@ inputs:
       The name of your main branch to merge the version changes to. E.g., "main" or "master". Defaults to "main".
     default: main
 
+  prefix-tag-with-v:
+    description:
+      Whether to prefix the tag with "v". E.g., `v1.2.3` vs `1.2.3`.
+    default: true
+
 runs:
   using: composite
   steps:
@@ -47,7 +52,7 @@ runs:
     - name: Ensure no according tag exists
       uses: nikita-volkov/fail-if-tag-exists.github-action@v1.0.0
       with:
-        tag: ${{ steps.bump-cabal-version.outputs.after }}
+        tag: ${{ inputs.prefix-tag-with-v == "true" && "v" || "" }}${{ steps.bump-cabal-version.outputs.after }}
 
     - name: Publish on Hackage
       uses: nikita-volkov/publish-to-hackage.github-action@v2.0.1
@@ -68,7 +73,7 @@ runs:
       with:
         github_token: ${{ inputs.github-token }}
         custom_tag: ${{ steps.bump-cabal-version.outputs.after }}
-        tag_prefix:
+        tag_prefix: ${{ inputs.prefix-tag-with-v == "true" && "v" || "" }}
         commit_sha: ${{ steps.commit.outputs.commit_hash }}
 
     - name: Merge to master
