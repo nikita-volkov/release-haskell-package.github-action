@@ -31,6 +31,6 @@ jobs:
       - uses: nikita-volkov/release-haskell-package.github-action@v1.0.0
         with:
           hackage-token: ${{ secrets.HACKAGE_TOKEN }}
-          version-bump-place: ${{ fromJSON('{"supermajor":0,major":1,"minor":2,"patch":3}')[github.ref_name] }}
+          version-bump-place: ${{ fromJSON('{"supermajor":0,"major":1,"minor":2,"patch":3}')[github.ref_name] }}
           main-branch: master
 ```
