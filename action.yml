@@ -61,7 +61,7 @@ runs:
         publish: true
 
     - name: Commit the version update
-      uses: stefanzweifel/git-auto-commit-action@v4
+      uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: Set package version to ${{ steps.bump-cabal-version.outputs.after }}
         file_pattern: |
