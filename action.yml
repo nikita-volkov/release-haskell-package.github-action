@@ -10,11 +10,6 @@ inputs:
       Authentication token for Hackage. You can generate it at [your Hackage account management page](http://hackage.haskell.org/users/account-management) and provide it via Github Actions Secrets.
     required: true
 
-  github-token:
-    description: |
-      Authentication token for Github. Needed for pushing to the repo.
-    required: true
-
   version-bump-place:
     description: |
       Index of the bumped version place.
@@ -71,7 +66,7 @@ runs:
     - name: Tag
       uses: mathieudutour/github-tag-action@v6.1
       with:
-        github_token: ${{ inputs.github-token }}
+        github_token: ${{ github.token }}
         custom_tag: ${{ steps.bump-cabal-version.outputs.after }}
         tag_prefix: ${{ inputs.prefix-tag-with-v == 'true' && 'v' || '' }}
         commit_sha: ${{ steps.commit.outputs.commit_hash }}
@@ -82,4 +77,4 @@ runs:
         type: now
         from_branch: ${{ github.ref_name }}
         target_branch: ${{ inputs.main-branch }}
-        github_token: ${{ inputs.github-token }}
+        github_token: ${{ github.token }}
