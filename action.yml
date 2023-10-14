@@ -61,6 +61,7 @@ runs:
         commit_message: Set package version to ${{ steps.bump-cabal-version.outputs.after }}
         file_pattern: |
           *.cabal
+        push_options: --fast-forward
       id: commit
 
     - name: Tag
