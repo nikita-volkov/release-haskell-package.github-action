@@ -36,6 +36,10 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Pull
+      shell: bash
+      run: |
+        git pull
 
     - name: Bump package version
       uses: nikita-volkov/edit-cabal-version.github-action@v1.1.1
@@ -61,7 +65,6 @@ runs:
         commit_message: Set package version to ${{ steps.bump-cabal-version.outputs.after }}
         file_pattern: |
           *.cabal
-        push_options: --fast-forward
       id: commit
 
     - name: Tag
