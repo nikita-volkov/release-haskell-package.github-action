@@ -32,14 +32,18 @@ inputs:
     description:
       Whether to prefix the tag with "v". E.g., `v1.2.3` vs `1.2.3`.
     default: true
+  
+  docs:
+    description:
+      Whether to generate the docs.
+    default: false
 
 runs:
   using: composite
   steps:
     - name: Pull
       shell: bash
-      run: |
-        git pull
+      run: git pull
 
     - name: Bump package version
       uses: nikita-volkov/edit-cabal-version.github-action@v1.1.1
@@ -53,11 +57,42 @@ runs:
       with:
         tag: ${{ inputs.prefix-tag-with-v == 'true' && 'v' || '' }}${{ steps.bump-cabal-version.outputs.after }}
 
+    - name: Generate package dist
+      shell: bash
+      run: cabal sdist
+
+    - name: Generate Haddock
+      if: ${{ inputs.docs }}
+      shell: bash
+      # We're doing it in such a complicated way to work around a bug in Cabal,
+      # due to which it may generate documentation dist only for the internal libs,
+      # if the name of the package is not specified thus:
+      # `cabal haddock --haddock-for-hackage $package_name`. 
+      run: |
+        cabal_file=$(find . -maxdepth 1 -name "*.cabal" -print -quit)
+        if [ ! -f "$cabal_file" ]; then
+          echo "Cabal-file not found"
+          exit 1
+        fi
+        
+        package_name=$(awk -F ":[[:space:]]*" 'tolower($1)=="name"    { print $2 }' < "$cabal_file")
+        if [ -z "$package_name" ]; then
+          echo "Unable to determine package name"
+          exit 1
+        fi
+        
+        echo "Determined package name: $package_name"
+        
+        cabal update
+        file=`cabal haddock --haddock-for-hackage $package_name | tail -1`
+        echo "file=${file}" >> "${GITHUB_OUTPUT}"
+
     - name: Publish on Hackage
-      uses: nikita-volkov/publish-to-hackage.github-action@v2.0.1
+      uses: haskell-actions/hackage-publish@v1.1
       with:
-        token: ${{ inputs.hackage-token }}
+        hackageToken: ${{ inputs.hackage-token }}
         publish: true
+        docsPath: dist-newstyle
 
     - name: Commit the version update
       uses: stefanzweifel/git-auto-commit-action@v5
