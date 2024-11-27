@@ -31,12 +31,12 @@ inputs:
   prefix-tag-with-v:
     description:
       Whether to prefix the tag with "v". E.g., `v1.2.3` vs `1.2.3`.
-    default: true
+    default: "true"
   
   docs:
     description:
       Whether to generate the docs.
-    default: false
+    default: "false"
 
 runs:
   using: composite
@@ -62,7 +62,7 @@ runs:
       run: cabal sdist
 
     - name: Generate Haddock
-      if: ${{ inputs.docs }}
+      if: ${{ inputs.docs == 'true' }}
       shell: bash
       # We're doing it in such a complicated way to work around a bug in Cabal,
       # due to which it may generate documentation dist only for the internal libs,
