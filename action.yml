@@ -71,7 +71,7 @@ runs:
           exit 1
         fi
         
-        package_name=$(awk -F ":[[:space:]]*" 'tolower($1)=="name"    { print $2 }' < "$cabal_file")
+        package_name=$(awk -F ":[[:space:]]*" 'tolower($1)=="name" { gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2); print $2 }' < "$cabal_file")
         if [ -z "$package_name" ]; then
           echo "Unable to determine package name"
           exit 1
