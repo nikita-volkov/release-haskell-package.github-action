@@ -3,6 +3,11 @@ name: Release a Haskell package repository
 description:
   Perform automatic version management and publish a package on Hackage.
 
+outputs:
+  hackage-url:
+    description: "The Hackage URL where the package was deployed"
+    value: ${{ steps.generate-hackage-url.outputs.url }}
+
 inputs:
 
   hackage-token:
@@ -56,6 +61,28 @@ runs:
       uses: nikita-volkov/fail-if-tag-exists.github-action@v1.0.0
       with:
         tag: ${{ inputs.prefix-tag-with-v == 'true' && 'v' || '' }}${{ steps.bump-cabal-version.outputs.after }}
+
+    - name: Extract package name and generate Hackage URL
+      shell: bash
+      run: |
+        cabal_file=$(find . -maxdepth 1 -name "*.cabal" -print -quit)
+        if [ ! -f "$cabal_file" ]; then
+          echo "Cabal-file not found"
+          exit 1
+        fi
+        
+        package_name=$(awk -F ":[[:space:]]*" 'tolower($1)=="name" { gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2); print $2 }' < "$cabal_file")
+        if [ -z "$package_name" ]; then
+          echo "Unable to determine package name"
+          exit 1
+        fi
+        
+        echo "Determined package name: $package_name"
+        version="${{ steps.bump-cabal-version.outputs.after }}"
+        hackage_url="https://hackage.haskell.org/package/${package_name}-${version}"
+        echo "Generated Hackage URL: $hackage_url"
+        echo "url=${hackage_url}" >> "${GITHUB_OUTPUT}"
+      id: generate-hackage-url
 
     - name: Generate package dist
       shell: bash
