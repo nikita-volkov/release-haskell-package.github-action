@@ -29,9 +29,18 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: nikita-volkov/release-haskell-package.github-action@d5c46c133b0f083fdc516ab5cb3d5bf46d6d3768
+        id: release
         with:
           hackage-token: ${{ secrets.HACKAGE_TOKEN }}
           version-bump-place: ${{ fromJSON('{"supermajor":0,"major":1,"minor":2,"patch":3}')[github.ref_name] }}
           main-branch: master
           prefix-tag-with-v: false
+      - name: Print Hackage URL
+        run: echo "Package deployed to ${{ steps.release.outputs.hackage-url }}"
 ```
+
+# Outputs
+
+The action provides the following outputs:
+
+- **hackage-url**: The URL where the package was deployed on Hackage (e.g., `https://hackage.haskell.org/package/my-package-1.2.3`)
